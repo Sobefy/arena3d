@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Bayfront Arena · Choose your seats</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%2710%27 fill=%27%23C9349B%27/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div id="stage" aria-label="3D arena. Drag to orbit, scroll to zoom, click a section or a seat."></div>
+
+  <div id="loading" role="status" aria-live="polite">
+    <div class="loading__inner">
+      <p class="loading__brand">Bayfront Arena</p>
+      <div class="loading__bar"><span id="loadingBar"></span></div>
+      <p class="loading__text" id="loadingText">Loading the venue… 0%</p>
+    </div>
+  </div>
+
+  <header class="topbar">
+    <div class="brand"><span class="brand__dot"></span>Bayfront Arena <small>Basketball · Sat Dec 12</small></div>
+    <nav class="crumbs" id="crumbs" aria-label="Location"></nav>
+    <button class="cartbtn" id="cartBtn" type="button" aria-label="Open cart">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2.2l2.4 11h10.6l2-8H6.3"/><circle cx="9" cy="19.5" r="1.4"/><circle cx="17" cy="19.5" r="1.4"/></svg>
+      <span>Cart</span><b id="cartCount">0</b>
+    </button>
+  </header>
+
+  <div class="chip" id="sectionChip" hidden></div>
+
+  <aside class="legend glass" id="legend" aria-label="Price tiers">
+    <button class="legend__toggle" id="legendToggle" type="button" aria-expanded="true">Tiers &amp; prices</button>
+    <div class="legend__body">
+      <ul class="legend__list" id="tierList"></ul>
+      <div class="range">
+        <div class="range__head"><span>Price</span><output id="rangeOut"></output></div>
+        <div class="range__track">
+          <input type="range" id="priceMin" aria-label="Minimum price" />
+          <input type="range" id="priceMax" aria-label="Maximum price" />
+        </div>
+      </div>
+      <button class="legend__reset" id="legendReset" type="button" hidden>Show all sections</button>
+      <ul class="legend__keys">
+        <li><i class="k k--avail"></i>Available</li>
+        <li><i class="k k--sold"></i>Sold</li>
+        <li><i class="k k--cart"></i>In cart</li>
+      </ul>
+    </div>
+  </aside>
+
+  <div class="tooltip" id="tooltip" role="tooltip" hidden></div>
+
+  <section class="card glass" id="card" aria-label="Seat details" aria-hidden="true">
+    <button class="card__close" id="cardClose" type="button" aria-label="Close">×</button>
+    <div class="card__content" id="cardContent">
+      <p class="card__eyebrow" id="cardTier"></p>
+      <h2 class="card__title" id="cardSection"></h2>
+      <div class="card__seatline">
+        <div><span>Row</span><b id="cardRow"></b></div>
+        <div><span>Seat</span><b id="cardSeat"></b></div>
+        <div><span>Level</span><b id="cardLevel"></b></div>
+      </div>
+      <div class="card__thumb">
+        <canvas id="cardThumb" width="320" height="180" aria-label="View from this seat"></canvas>
+        <span class="card__thumblabel">View from seat</span>
+      </div>
+      <div class="card__price">
+        <b id="cardPrice"></b>
+        <span class="badge" id="cardBadge"></span>
+      </div>
+      <p class="card__note" id="cardNote"></p>
+    </div>
+    <div class="card__actions">
+      <button class="btn btn--primary" id="btnPov" type="button">View from seat</button>
+      <button class="btn btn--ghost" id="btnAdd" type="button">Add to cart</button>
+    </div>
+  </section>
+
+  <div class="povbar glass" id="povbar" hidden>
+    <button class="btn btn--ghost" id="povBack" type="button">← Back to arena</button>
+    <div class="povbar__steps" role="group" aria-label="Move to a neighbouring seat">
+      <button class="iconbtn" id="povRowUp" type="button" aria-label="Row in front">▲</button>
+      <button class="iconbtn" id="povSeatPrev" type="button" aria-label="Seat to the left">◀</button>
+      <button class="iconbtn" id="povSeatNext" type="button" aria-label="Seat to the right">▶</button>
+      <button class="iconbtn" id="povRowDown" type="button" aria-label="Row behind">▼</button>
+    </div>
+    <span class="povbar__hint" id="povHint">Drag to look around</span>
+  </div>
+
+  <aside class="drawer glass" id="drawer" aria-label="Cart" aria-hidden="true">
+    <div class="drawer__head"><h2>Your seats</h2><button class="card__close" id="drawerClose" type="button" aria-label="Close cart">×</button></div>
+    <ul class="drawer__list" id="cartList"></ul>
+    <div class="drawer__sum">
+      <div><span>Subtotal</span><b id="sumSub"></b></div>
+      <div><span>Fees (12%)</span><b id="sumFees"></b></div>
+      <div class="drawer__total"><span>Total</span><b id="sumTotal"></b></div>
+      <button class="btn btn--primary btn--block" id="checkout" type="button">Checkout</button>
+      <p class="drawer__note" id="cartNote">Up to 8 seats per order.</p>
+    </div>
+  </aside>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="stats" id="stats" hidden></div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

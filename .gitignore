@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.DS_Store
+*.blend1
+# a backup of the scene before the signage pass
+arena.pre-signage.blend
+# reference clip from a third party: not ours to publish
+example.mp4
+# 82 MB, re-exported from arena_game.blend by web/scripts/bake_lm.py
+export/arena_venue.glb
+.env*
